@@ -1,6 +1,6 @@
 <template>
-  <div>
-    <DragTable :data :columns />
+  <div style="width: 1000px; height: 500px">
+    <DragTable :data :columns @onDragEnd="onDragEnd" />
   </div>
 </template>
 
@@ -167,30 +167,40 @@ const columns = ref<ColumnsType[]>([
   {
     title: '执行编号',
     dataIndex: 'id',
-    width: 100,
+    width: 200,
   },
   {
     title: '任务类型',
     dataIndex: 'type',
     required: true,
+    width: 200,
   },
   {
     title: '创建时间',
     dataIndex: 'createTime',
+    width: 200,
   },
   {
     title: '创建人',
     dataIndex: 'createBy',
+    width: 200,
   },
   {
     title: '执行状态',
     dataIndex: 'finish',
+    width: 200,
   },
   {
     title: '执行结果',
     dataIndex: 'success',
+    width: 200,
+    fixed: 'right',
   },
 ])
+
+const onDragEnd = (columns: ColumnsType[]) => {
+  console.log(columns, 'columns')
+}
 </script>
 
 <style scoped></style>
