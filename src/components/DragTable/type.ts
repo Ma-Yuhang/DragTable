@@ -5,6 +5,19 @@ export interface ColumnsType {
   required?: boolean
   key?: string | number
   fixed?: boolean | 'left' | 'right'
+  valueEnumName?: string
+  options?: Options
+}
+
+export type Options = ArrayOptions | ObjectOptions
+
+export interface BasicOptions {
+  label: string | number
+  value: string | number | boolean
+}
+export type ArrayOptions = BasicOptions[]
+export interface ObjectOptions {
+  [label: string | number]: string | number | boolean
 }
 
 export interface DragTableProps {
@@ -20,4 +33,8 @@ export interface DragTableProps {
    * 是否开启拖拽
    */
   draggable?: boolean
+}
+
+export interface Dictionary {
+  [name: string | number]: Options
 }

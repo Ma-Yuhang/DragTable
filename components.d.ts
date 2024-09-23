@@ -9,6 +9,7 @@ declare module 'vue' {
   export interface GlobalComponents {
     DragTable: typeof import('./src/components/DragTable/index.vue')['default']
     ElButton: typeof import('element-plus/es')['ElButton']
+    ElEmpty: typeof import('element-plus/es')['ElEmpty']
     ElInput: typeof import('element-plus/es')['ElInput']
     ElTable: typeof import('element-plus/es')['ElTable']
     ElTableColumn: typeof import('element-plus/es')['ElTableColumn']
