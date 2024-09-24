@@ -1,6 +1,6 @@
 <template>
   <div style="width: 1000px; height: 500px">
-    <DragTable :data :columns @onDragEnd="onDragEnd" @editRow="editRow" />
+    <DragTable name="list" :data :columns @onDragEnd="onDragEnd" @editRow="editRow" />
   </div>
 </template>
 
@@ -34,7 +34,7 @@ const data = ref([
   {
     id: 1,
     type: 'REFRESH_COST_PRICE',
-    createTime: '2023-01-01 12:00:00',
+    createTime: '',
     createBy: '李芳',
     finish: false,
     success: false,
@@ -43,9 +43,9 @@ const data = ref([
     id: 1,
     type: 'REFRESH_COST_PRICE',
     createTime: '2023-01-01 12:00:00',
-    createBy: '李芳',
+    createBy: '',
     finish: false,
-    success: false,
+    success: '',
   },
   {
     id: 1,

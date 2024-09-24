@@ -62,14 +62,15 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import type { DragTableProps, Options } from './type'
 
 defineOptions({
   name: 'DragTable',
 })
 
-const { data, columns, draggable = true } = defineProps<DragTableProps>()
+const { data, columns, draggable = true, name } = defineProps<DragTableProps>()
+const DRAG_COLUMNS_KEY = 'hang_drag_columns'
 const emit = defineEmits(['onDragEnd', 'editRow'])
 const dragColumns = ref(columns)
 const dragState = ref({
@@ -79,16 +80,26 @@ const dragState = ref({
   direction: '',
 })
 
+// 读取持久化的拖拽后的表格列顺序
+onMounted(() => {
+  if (!name) return
+  const dragObj = JSON.parse(localStorage.getItem(DRAG_COLUMNS_KEY) || '')
+  const columns = dragObj[name]
+  if (columns) {
+    dragColumns.value = columns
+  }
+})
+
 const isObject = (val: any): boolean => {
   return Object.prototype.toString.call(val) === '[object Object]'
 }
 const valueFormat = (value: any, options: Options | undefined) => {
   if (Array.isArray(options)) {
-    return options.find((item) => item.value === value)?.label || value
+    return options.find((item) => item.value === value)?.label || '-'
   } else if (isObject(options)) {
-    return options![value] || value
+    return options![value] || '-'
   } else {
-    return value
+    return value || '-'
   }
 }
 
@@ -181,7 +192,10 @@ const headDraged = () => {
  * 将拖拽后的dragColumns持久化到localStorage
  */
 const saveDragColumns = () => {
-  localStorage.setItem('dragColumns', JSON.stringify(dragColumns.value))
+  if (!name) return
+  const hangDragColumns = JSON.parse(localStorage.getItem(DRAG_COLUMNS_KEY) || '{}')
+  hangDragColumns[name] = dragColumns.value
+  localStorage.setItem(DRAG_COLUMNS_KEY, JSON.stringify(hangDragColumns))
 }
 /**
  * 拖动虚线样式设置

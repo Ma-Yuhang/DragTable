@@ -26,6 +26,10 @@ export interface DragTableProps {
    */
   data: any[]
   /**
+   * 表格名称
+   */
+  name?: string
+  /**
    * 表头数据
    */
   columns: ColumnsType[]
