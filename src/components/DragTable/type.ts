@@ -1,3 +1,5 @@
+type ValueType = 'input' | 'select' | 'datetime'
+
 export interface ColumnsType {
   title: string
   dataIndex: string
@@ -5,6 +7,8 @@ export interface ColumnsType {
   required?: boolean
   key?: string | number
   fixed?: boolean | 'left' | 'right'
+  valueType?: ValueType
+  hidden?: boolean
   valueEnumName?: string
   options?: Options
 }

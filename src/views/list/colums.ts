@@ -12,6 +12,7 @@ export const listColumns: ColumnsType[] = [
     required: true,
     width: 200,
     valueEnumName: 'taskType',
+    hidden: true,
   },
   {
     title: '创建时间',

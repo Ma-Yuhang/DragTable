@@ -8,7 +8,7 @@
     :header-cell-class-name="cellClassName"
   >
     <el-table-column
-      v-for="column in dragColumns"
+      v-for="column in allColumns"
       :key="column.key"
       :prop="column.dataIndex"
       :label="column.title"
@@ -62,8 +62,9 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import type { DragTableProps, Options } from './type'
+import { isArray } from '@/utils/type'
 
 defineOptions({
   name: 'DragTable',
@@ -72,7 +73,7 @@ defineOptions({
 const { data, columns, draggable = true, name } = defineProps<DragTableProps>()
 const DRAG_COLUMNS_KEY = 'hang_drag_columns'
 const emit = defineEmits(['onDragEnd', 'editRow'])
-const dragColumns = ref(columns)
+const allColumns = ref()
 const dragState = ref({
   start: 0,
   end: 0,
@@ -80,15 +81,58 @@ const dragState = ref({
   direction: '',
 })
 
+const showColumns = computed(() => {
+  return columns.filter((column) => !column.hidden)
+})
 // 读取持久化的拖拽后的表格列顺序
 onMounted(() => {
-  if (!name) return
-  const dragObj = JSON.parse(localStorage.getItem(DRAG_COLUMNS_KEY) || '')
-  const columns = dragObj[name]
-  if (columns) {
-    dragColumns.value = columns
+  if (!name) {
+    allColumns.value = showColumns.value
+    return
+  } else {
+    const allDragStringify = localStorage.getItem(DRAG_COLUMNS_KEY)
+    if (!allDragStringify) {
+      allColumns.value = showColumns.value
+      return
+    }
+    const allDragParse = JSON.parse(allDragStringify)
+    if (!isObject(allDragParse)) {
+      allColumns.value = showColumns.value
+      return
+    }
+    const dragColumns = allDragParse[name]
+    if (!isArray(dragColumns)) {
+      allColumns.value = showColumns.value
+      return
+    }
+    allColumns.value = dragColumns
   }
 })
+// const dragColumns = computed({
+//   get() {
+//     const allColumns = columns.filter((column) => !column.hidden)
+//     if (!name) {
+//       return allColumns
+//     } else {
+//       const allDragStringify = localStorage.getItem(DRAG_COLUMNS_KEY)
+//       if (!allDragStringify) {
+//         return allColumns
+//       }
+//       const allDragParse = JSON.parse(allDragStringify)
+//       if (!isObject(allDragParse)) {
+//         return allColumns
+//       }
+//       const dragColumns = allDragParse[name]
+//       if (!isArray(dragColumns)) {
+//         return allColumns
+//       }
+//       return dragColumns
+//     }
+//   },
+//   set(val) {
+//     console.log(val, 'val')
+//   },
+// })
 
 const isObject = (val: any): boolean => {
   return Object.prototype.toString.call(val) === '[object Object]'
@@ -166,7 +210,7 @@ const handleDragEnd = () => {
   // 将拖拽后的dragColumns持久化到localStorage
   saveDragColumns()
   // 触发自定义拖拽结束事件
-  emit('onDragEnd', dragColumns.value)
+  emit('onDragEnd', allColumns.value)
 }
 /**
  * 重置拖拽状态
@@ -184,9 +228,11 @@ const resetDragState = () => {
  */
 const headDraged = () => {
   const { start, end } = dragState.value
-  const startColumn = dragColumns.value[start]
-  dragColumns.value.splice(start, 1)
-  dragColumns.value.splice(end, 0, startColumn)
+  console.log(start, end, 'start, end')
+
+  const startColumn = allColumns.value[start]
+  allColumns.value.splice(start, 1)
+  allColumns.value.splice(end, 0, startColumn)
 }
 /**
  * 将拖拽后的dragColumns持久化到localStorage
@@ -194,7 +240,7 @@ const headDraged = () => {
 const saveDragColumns = () => {
   if (!name) return
   const hangDragColumns = JSON.parse(localStorage.getItem(DRAG_COLUMNS_KEY) || '{}')
-  hangDragColumns[name] = dragColumns.value
+  hangDragColumns[name] = allColumns.value
   localStorage.setItem(DRAG_COLUMNS_KEY, JSON.stringify(hangDragColumns))
 }
 /**

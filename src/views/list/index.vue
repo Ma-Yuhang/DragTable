@@ -1,6 +1,7 @@
 <template>
   <div style="width: 1000px; height: 500px">
     <DragTable name="list" :data :columns @onDragEnd="onDragEnd" @editRow="editRow" />
+    <button @click="handle">toggle</button>
   </div>
 </template>
 
@@ -196,7 +197,8 @@ const dictionary = {
 }
 
 const columns = useColumns(listColumns, dictionary)
-
+console.log(columns, 'columns')
+const handle = () => {}
 const editRow = (row: any, columns: any, index: number) => {
   console.log(row, columns, index, 'editRow')
 }
