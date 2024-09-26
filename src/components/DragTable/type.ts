@@ -8,7 +8,7 @@ export interface ColumnsType {
   key?: string | number
   fixed?: boolean | 'left' | 'right'
   valueType?: ValueType
-  hidden?: boolean
+  // hidden?: boolean
   valueEnumName?: string
   options?: Options
 }

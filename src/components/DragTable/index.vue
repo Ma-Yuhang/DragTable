@@ -8,7 +8,7 @@
     :header-cell-class-name="cellClassName"
   >
     <el-table-column
-      v-for="column in allColumns"
+      v-for="column in showColumns"
       :key="column.key"
       :prop="column.dataIndex"
       :label="column.title"
@@ -62,18 +62,19 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import type { DragTableProps, Options } from './type'
-import { isArray } from '@/utils/type'
+import { isArray, isObject } from '@/utils/typeTools'
 
 defineOptions({
   name: 'DragTable',
 })
 
-const { data, columns, draggable = true, name } = defineProps<DragTableProps>()
+const { data, columns: defaultColumns, draggable = true, name } = defineProps<DragTableProps>()
 const DRAG_COLUMNS_KEY = 'hang_drag_columns'
 const emit = defineEmits(['onDragEnd', 'editRow'])
-const allColumns = ref()
+// 呈现在页面上的表格列顺序
+const showColumns = ref()
 const dragState = ref({
   start: 0,
   end: 0,
@@ -81,62 +82,37 @@ const dragState = ref({
   direction: '',
 })
 
-const showColumns = computed(() => {
-  return columns.filter((column) => !column.hidden)
-})
-// 读取持久化的拖拽后的表格列顺序
 onMounted(() => {
+  // 设置表格列顺序
+  setShowColumns()
+})
+
+// 设置表格列顺序（本地存储中有就取本地存储的，没有就是默认顺序）
+const setShowColumns = () => {
   if (!name) {
-    allColumns.value = showColumns.value
+    showColumns.value = defaultColumns
     return
   } else {
     const allDragStringify = localStorage.getItem(DRAG_COLUMNS_KEY)
     if (!allDragStringify) {
-      allColumns.value = showColumns.value
+      showColumns.value = defaultColumns
       return
     }
     const allDragParse = JSON.parse(allDragStringify)
     if (!isObject(allDragParse)) {
-      allColumns.value = showColumns.value
+      showColumns.value = defaultColumns
       return
     }
     const dragColumns = allDragParse[name]
     if (!isArray(dragColumns)) {
-      allColumns.value = showColumns.value
+      showColumns.value = defaultColumns
       return
     }
-    allColumns.value = dragColumns
+    showColumns.value = dragColumns
   }
-})
-// const dragColumns = computed({
-//   get() {
-//     const allColumns = columns.filter((column) => !column.hidden)
-//     if (!name) {
-//       return allColumns
-//     } else {
-//       const allDragStringify = localStorage.getItem(DRAG_COLUMNS_KEY)
-//       if (!allDragStringify) {
-//         return allColumns
-//       }
-//       const allDragParse = JSON.parse(allDragStringify)
-//       if (!isObject(allDragParse)) {
-//         return allColumns
-//       }
-//       const dragColumns = allDragParse[name]
-//       if (!isArray(dragColumns)) {
-//         return allColumns
-//       }
-//       return dragColumns
-//     }
-//   },
-//   set(val) {
-//     console.log(val, 'val')
-//   },
-// })
-
-const isObject = (val: any): boolean => {
-  return Object.prototype.toString.call(val) === '[object Object]'
 }
+
+// 格式化单元格内容
 const valueFormat = (value: any, options: Options | undefined) => {
   if (Array.isArray(options)) {
     return options.find((item) => item.value === value)?.label || '-'
@@ -147,9 +123,11 @@ const valueFormat = (value: any, options: Options | undefined) => {
   }
 }
 
+// 编辑
 const editRow = (row: any, columns: any, index: number) => {
   emit('editRow', row, columns, index)
 }
+
 /**
  * 鼠标按下，添加可拖拽属性
  * @param column 按下的列（element plus提供的）
@@ -169,6 +147,7 @@ const handleMouseDown = (column: any, index: number) => {
   // 添加拖拽结束事件
   document.addEventListener('dragend', handleDragEnd)
 }
+
 /**
  * 拖拽中
  * @param index 当前移动到的列索引
@@ -191,6 +170,7 @@ const handleDragover = (column: any, index: number) => {
     }
   }
 }
+
 /**
  * 拖拽结束
  *
@@ -208,10 +188,11 @@ const handleDragEnd = () => {
   // 消除拖拽结束事件
   document.removeEventListener('dragend', handleDragEnd)
   // 将拖拽后的dragColumns持久化到localStorage
-  saveDragColumns()
+  saveDragedColumnsTolocalStorage()
   // 触发自定义拖拽结束事件
-  emit('onDragEnd', allColumns.value)
+  emit('onDragEnd', showColumns.value)
 }
+
 /**
  * 重置拖拽状态
  */
@@ -223,6 +204,7 @@ const resetDragState = () => {
     direction: '',
   }
 }
+
 /**
  * 更新表头，即更新表格columns的顺序
  */
@@ -230,19 +212,21 @@ const headDraged = () => {
   const { start, end } = dragState.value
   console.log(start, end, 'start, end')
 
-  const startColumn = allColumns.value[start]
-  allColumns.value.splice(start, 1)
-  allColumns.value.splice(end, 0, startColumn)
+  const startColumn = showColumns.value[start]
+  showColumns.value.splice(start, 1)
+  showColumns.value.splice(end, 0, startColumn)
 }
+
 /**
  * 将拖拽后的dragColumns持久化到localStorage
  */
-const saveDragColumns = () => {
+const saveDragedColumnsTolocalStorage = () => {
   if (!name) return
   const hangDragColumns = JSON.parse(localStorage.getItem(DRAG_COLUMNS_KEY) || '{}')
-  hangDragColumns[name] = allColumns.value
+  hangDragColumns[name] = showColumns.value
   localStorage.setItem(DRAG_COLUMNS_KEY, JSON.stringify(hangDragColumns))
 }
+
 /**
  * 拖动虚线样式设置
  * @param param0
