@@ -1,64 +1,77 @@
 <template>
-  <el-table
-    :data="data"
-    style="width: 100%; height: 100%"
-    row-key="id"
-    border
-    :cell-class-name="cellClassName"
-    :header-cell-class-name="cellClassName"
-  >
-    <el-table-column
-      v-for="column in showColumns"
-      :key="column.key"
-      :prop="column.dataIndex"
-      :label="column.title"
-      :width="column.width"
-      header-align="center"
-      align="center"
-      show-overflow-tooltip
-      :fixed="column.fixed"
+  <div>
+    <el-table
+      :data="data"
+      style="width: 100%; height: 100%"
+      row-key="id"
+      border
+      :cell-class-name="cellClassName"
+      :header-cell-class-name="cellClassName"
     >
-      <template v-if="draggable" #header="{ column: $column, $index }">
-        <div
-          @mousedown="handleMouseDown($column, $index)"
-          @dragover="handleDragover($column, $index)"
-        >
-          <span :class="{ required: column.required }">
-            {{ column.title }}
-          </span>
+      <el-table-column
+        v-for="column in showColumns"
+        :key="column.key"
+        :prop="column.dataIndex"
+        :label="column.title"
+        :width="column.width"
+        header-align="center"
+        align="center"
+        show-overflow-tooltip
+        :fixed="column.fixed"
+      >
+        <template v-if="draggable" #header="{ column: $column, $index }">
+          <div
+            @mousedown="handleMouseDown($column, $index)"
+            @dragover="handleDragover($column, $index)"
+          >
+            <span :class="{ required: column.required }">
+              {{ column.title }}
+            </span>
+          </div>
+        </template>
+        <template v-else #header>
+          <div>
+            <span :class="{ required: column.required }">
+              {{ column.title }}
+            </span>
+          </div>
+        </template>
+        <template #default="{ row }">
+          {{ valueFormat(row[column.dataIndex], column.options) }}
+        </template>
+      </el-table-column>
+      <el-table-column header-align="center" align="center" fixed="right" min-width="200">
+        <template #header>
+          <div>
+            <span>操作</span>
+          </div>
+        </template>
+        <template #default="{ row, $index }">
+          <el-button plain type="primary" size="small" @click="editRow(row, columns, $index)">
+            编辑
+          </el-button>
+          <el-button plain size="small">取消</el-button>
+          <el-button plain link type="primary" size="small">下载</el-button>
+        </template>
+      </el-table-column>
+      <template #empty>
+        <div class="empty">
+          <el-empty description="暂无数据" />
         </div>
       </template>
-      <template v-else #header>
-        <div>
-          <span :class="{ required: column.required }">
-            {{ column.title }}
-          </span>
-        </div>
-      </template>
-      <template #default="{ row }">
-        {{ valueFormat(row[column.dataIndex], column.options) }}
-      </template>
-    </el-table-column>
-    <el-table-column header-align="center" align="center" fixed="right" min-width="200">
-      <template #header>
-        <div>
-          <span>操作</span>
-        </div>
-      </template>
-      <template #default="{ row, $index }">
-        <el-button plain type="primary" size="small" @click="editRow(row, columns, $index)">
-          编辑
-        </el-button>
-        <el-button plain size="small">取消</el-button>
-        <el-button plain link type="primary" size="small">下载</el-button>
-      </template>
-    </el-table-column>
-    <template #empty>
-      <div class="empty">
-        <el-empty description="暂无数据" />
-      </div>
-    </template>
-  </el-table>
+    </el-table>
+    <el-pagination
+      v-model:current-page="currentPage"
+      v-model:page-size="pageSize"
+      :page-sizes="[10, 20, 30, 40]"
+      background
+      layout="total, sizes, prev, pager, next, jumper"
+      :total="total"
+      style="margin-top: 20px"
+      @size-change="handleSizeChange"
+      @current-change="handleCurrentChange"
+    />
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -69,10 +82,19 @@ import { isArray, isObject } from '@/utils/typeTools'
 defineOptions({
   name: 'DragTable',
 })
+const {
+  data,
+  columns: defaultColumns,
+  draggable = true,
+  name,
+  pagination,
+  total,
+} = defineProps<DragTableProps>()
 
-const { data, columns: defaultColumns, draggable = true, name } = defineProps<DragTableProps>()
+const currentPage = ref(pagination.currentPage)
+const pageSize = ref(pagination.pageSize)
 const DRAG_COLUMNS_KEY = 'hang_drag_columns'
-const emit = defineEmits(['onDragEnd', 'editRow'])
+const emit = defineEmits(['onDragEnd', 'editRow', 'pageSizeChange', 'currentPageChange'])
 // 呈现在页面上的表格列顺序
 const showColumns = ref()
 const dragState = ref({
@@ -121,6 +143,12 @@ const valueFormat = (value: any, options: Options | undefined) => {
   } else {
     return value || '-'
   }
+}
+const handleSizeChange = (val: number) => {
+  emit('pageSizeChange', val)
+}
+const handleCurrentChange = (val: number) => {
+  emit('currentPageChange', val)
 }
 
 // 编辑

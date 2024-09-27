@@ -1,7 +1,16 @@
 <template>
   <div style="width: 1000px; height: 500px">
-    <DragTable name="list" :data :columns @onDragEnd="onDragEnd" @editRow="editRow" />
-    <button @click="handle">toggle</button>
+    <DragTable
+      name="list"
+      :data
+      :columns
+      :total
+      :pagination
+      @on-drag-end="onDragEnd"
+      @edit-row="editRow"
+      @page-size-change="pageSizeChange"
+      @current-page-change="currentPageChange"
+    />
   </div>
 </template>
 
@@ -169,6 +178,12 @@ const data = ref([
     success: false,
   },
 ])
+const total = ref(100)
+const pagination = ref({
+  currentPage: 1,
+  pageSize: 10,
+})
+
 const dictionary = {
   taskType: {
     REFRESH_SALES_PRICE: '刷新销售单价',
@@ -197,8 +212,13 @@ const dictionary = {
 }
 
 const columns = useColumns(listColumns, dictionary)
-console.log(columns, 'columns')
-const handle = () => {}
+
+const pageSizeChange = (val: number) => {
+  console.log('pageSizeChange', val)
+}
+const currentPageChange = (val: number) => {
+  console.log('currentPageChange', val)
+}
 const editRow = (row: any, columns: any, index: number) => {
   console.log(row, columns, index, 'editRow')
 }

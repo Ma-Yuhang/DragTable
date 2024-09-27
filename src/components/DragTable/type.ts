@@ -24,6 +24,10 @@ export interface ObjectOptions {
   [label: string | number]: string | number | boolean
 }
 
+type Pagination = {
+  currentPage: number
+  pageSize: number
+}
 export interface DragTableProps {
   /**
    * 表格数据
@@ -34,9 +38,11 @@ export interface DragTableProps {
    */
   name?: string
   /**
-   * 表头数据
+   * 表格列配置
    */
   columns: ColumnsType[]
+  total: number
+  pagination: Pagination
   /**
    * 是否开启拖拽
    */
