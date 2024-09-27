@@ -2,7 +2,7 @@
   <div>
     <el-table
       :data="data"
-      style="width: 100%; height: 100%"
+      style="width: 100%; height: calc(100% - 52px)"
       row-key="id"
       border
       :cell-class-name="cellClassName"
@@ -60,17 +60,19 @@
         </div>
       </template>
     </el-table>
-    <el-pagination
-      v-model:current-page="currentPage"
-      v-model:page-size="pageSize"
-      :page-sizes="[10, 20, 30, 40]"
-      background
-      layout="total, sizes, prev, pager, next, jumper"
-      :total="total"
-      style="margin-top: 20px"
-      @size-change="handleSizeChange"
-      @current-change="handleCurrentChange"
-    />
+    <div style="height: 32px;">
+      <el-pagination
+        v-model:current-page="currentPage"
+        v-model:page-size="pageSize"
+        :page-sizes="[10, 20, 30, 40]"
+        background
+        layout="total, sizes, prev, pager, next, ->, jumper"
+        :total="total"
+        style="margin-top: 20px"
+        @size-change="handleSizeChange"
+        @current-change="handleCurrentChange"
+      />
+    </div>
   </div>
 </template>
 
@@ -144,9 +146,13 @@ const valueFormat = (value: any, options: Options | undefined) => {
     return value || '-'
   }
 }
+
+// 表格一共多少行，发生变化
 const handleSizeChange = (val: number) => {
   emit('pageSizeChange', val)
 }
+
+// 当前页码发生变化
 const handleCurrentChange = (val: number) => {
   emit('currentPageChange', val)
 }
