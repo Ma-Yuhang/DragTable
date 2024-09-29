@@ -60,7 +60,7 @@
         </div>
       </template>
     </el-table>
-    <div style="height: 32px;">
+    <div style="height: 32px">
       <el-pagination
         v-model:current-page="currentPage"
         v-model:page-size="pageSize"
@@ -82,7 +82,7 @@ import type { DragTableProps, Options } from './type'
 import { isArray, isObject } from '@/utils/typeTools'
 
 defineOptions({
-  name: 'DragTable',
+  name: 'drag-table',
 })
 const {
   data,
