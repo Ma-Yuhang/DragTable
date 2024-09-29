@@ -1,6 +1,6 @@
 <template>
   <div>
-    <drag-table
+    <DragTable
       style="width: 1000px; height: 500px"
       name="list"
       :data

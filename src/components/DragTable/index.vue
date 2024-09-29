@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-table
+    <ElTable
       :data="data"
       style="width: 100%; height: calc(100% - 52px)"
       row-key="id"
@@ -8,7 +8,7 @@
       :cell-class-name="cellClassName"
       :header-cell-class-name="cellClassName"
     >
-      <el-table-column
+      <ElTableColumn
         v-for="column in showColumns"
         :key="column.key"
         :prop="column.dataIndex"
@@ -39,29 +39,29 @@
         <template #default="{ row }">
           {{ valueFormat(row[column.dataIndex], column.options) }}
         </template>
-      </el-table-column>
-      <el-table-column header-align="center" align="center" fixed="right" min-width="200">
+      </ElTableColumn>
+      <ElTableColumn header-align="center" align="center" fixed="right" min-width="200">
         <template #header>
           <div>
             <span>操作</span>
           </div>
         </template>
         <template #default="{ row, $index }">
-          <el-button plain type="primary" size="small" @click="editRow(row, columns, $index)">
+          <ElButton plain type="primary" size="small" @click="editRow(row, columns, $index)">
             编辑
-          </el-button>
-          <el-button plain size="small">取消</el-button>
-          <el-button plain link type="primary" size="small">下载</el-button>
+          </ElButton>
+          <ElButton plain size="small">取消</ElButton>
+          <ElButton plain link type="primary" size="small">下载</ElButton>
         </template>
-      </el-table-column>
+      </ElTableColumn>
       <template #empty>
         <div class="empty">
-          <el-empty description="暂无数据" />
+          <ElEmpty description="暂无数据" />
         </div>
       </template>
-    </el-table>
+    </ElTable>
     <div style="height: 32px">
-      <el-pagination
+      <ElPagination
         v-model:current-page="currentPage"
         v-model:page-size="pageSize"
         :page-sizes="[10, 20, 30, 40]"
@@ -82,7 +82,7 @@ import type { DragTableProps, Options } from './type'
 import { isArray, isObject } from '@/utils/typeTools'
 
 defineOptions({
-  name: 'drag-table',
+  name: 'DragTable',
 })
 const {
   data,

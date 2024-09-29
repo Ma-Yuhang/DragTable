@@ -1,11 +1,11 @@
 <template>
   <!-- 使用element-plus中文语言包 -->
-  <el-config-provider :locale="zhCn">
+  <ElConfigProvider :locale="zhCn">
     <div>
       <h1>App</h1>
-      <list-page />
+      <ListPage />
     </div>
-  </el-config-provider>
+  </ElConfigProvider>
 </template>
 
 <script setup lang="ts">
