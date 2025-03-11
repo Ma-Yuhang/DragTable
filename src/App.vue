@@ -4,6 +4,7 @@
     <div>
       <h1>App</h1>
       <ListPage />
+      <TestModal></TestModal>
     </div>
   </ElConfigProvider>
 </template>
@@ -12,6 +13,7 @@
 import { ElConfigProvider } from 'element-plus'
 import zhCn from 'element-plus/es/locale/lang/zh-cn'
 import ListPage from '@/views/list/index.vue'
+import TestModal from '@/views/testModal/index.vue'
 </script>
 
 <style scoped></style>

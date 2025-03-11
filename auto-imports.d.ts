@@ -6,5 +6,5 @@
 // biome-ignore lint: disable
 export {}
 declare global {
-
+  const ElDialog: typeof import('element-plus/es')['ElDialog']
 }

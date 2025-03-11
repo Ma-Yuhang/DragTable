@@ -8,7 +8,7 @@ export const isObject = (obj: any): boolean => {
 }
 
 /**
- * 判断一个值是否是函数
+ * 判断一个值是否是数组
  * @param arr 目标值
  * @returns
  */
