@@ -11,21 +11,31 @@ import { ElDialog, ElButton } from 'element-plus'
 import type { DialogProps } from 'element-plus'
 import 'element-plus/dist/index.css'
 
-interface FooterProps {
-  onCancel: () => void
-  onConfirm: () => void
-  loading?: boolean
-}
-
 // 扩展组件实例，包含可能的submit方法
 interface ComponentInstance extends ComponentPublicInstance {
-  submit?: () => Promise<void> | void
+  confirm?: () => Promise<void> | void
 }
 
 // 返回值类型
 interface DialogReturn {
   unmount: () => void
   instance: Ref<ComponentInstance | undefined>
+}
+
+interface DialogEvents {
+  onOpen?: () => void
+  onClose?: () => void
+  onOpened?: () => void
+  onClosed?: () => void
+  onBeforeClose?: (done: () => void) => void
+}
+
+type CustomDialogProps = Partial<DialogProps> & DialogEvents
+
+interface FooterProps {
+  onCancel: () => void
+  onConfirm: () => void
+  loading?: boolean
 }
 const footer = (props: FooterProps): VNode =>
   h('div', { class: 'dialog-footer' }, [
@@ -47,7 +57,7 @@ const footer = (props: FooterProps): VNode =>
 export default function createDialog<P extends Record<string, any>>(
   component: Component,
   componentProps: P,
-  dialogProps: Partial<DialogProps>
+  dialogProps: CustomDialogProps
 ): DialogReturn {
   const open = ref(true)
   const instance = ref<ComponentInstance>()
@@ -79,7 +89,7 @@ export default function createDialog<P extends Record<string, any>>(
   const onConfirm = async () => {
     loading.value = true
     try {
-      await instance.value?.submit?.()
+      await instance.value?.confirm?.()
       unmount()
     } finally {
       loading.value = false

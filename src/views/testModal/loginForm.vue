@@ -31,6 +31,6 @@ const submit = () => {
 }
 
 defineExpose({
-  submit,
+  confirm: submit,
 })
 </script>
